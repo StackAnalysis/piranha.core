@@ -14,10 +14,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Piranha;
-using Piranha.Data.EF.SQLite;
-using Piranha.AspNetCore.Identity.SQLite;
+using Piranha.AspNetCore.Identity.SQLServer;
 using Piranha.AttributeBuilder;
 using Piranha.Local;
+using Piranha.Data.EF.SQLServer;
+using System;
 
 namespace MvcWeb
 {
@@ -37,10 +38,31 @@ namespace MvcWeb
                 options.UseTinyMCE();
                 options.UseMemoryCache();
 
-                options.UseEF<SQLiteDb>(db =>
-                    db.UseSqlite("Filename=./piranha.mvcweb.db"));
-                options.UseIdentityWithSeed<IdentitySQLiteDb>(db =>
-                    db.UseSqlite("Filename=./piranha.mvcweb.db"));
+                options.UseEF<SQLServerDb>(db => db.UseSqlServer("Server=80.209.233.70;Database=StackAnalsysisBlog;User ID=sa;Password=Sarah#2010;MultipleActiveResultSets=true"));
+                
+                options.UseIdentityWithSeed<IdentitySQLServerDb>(db =>
+                     db.UseSqlServer("Server=80.209.233.70;Database=StackAnalsysisBlog;User ID=sa;Password=Sarah#2010;MultipleActiveResultSets=true"),
+
+                     identityOptions: io =>
+                     {
+                        // Password settings
+                        io.Password.RequireDigit = false;
+                         io.Password.RequiredLength = 6;
+                         io.Password.RequireNonAlphanumeric = false;
+                         io.Password.RequireUppercase = false;
+                         io.Password.RequireLowercase = false;
+                         io.Password.RequiredUniqueChars = 1;
+
+                        // Lockout settings
+                        io.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                         io.Lockout.MaxFailedAccessAttempts = 10;
+                         io.Lockout.AllowedForNewUsers = true;
+
+                        // User settings
+                        io.User.RequireUniqueEmail = true;
+                     });
+
+
 
                 options.UseSecurity(o =>
                 {
